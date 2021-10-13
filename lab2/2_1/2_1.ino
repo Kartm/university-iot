@@ -23,6 +23,14 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
 
   digitalWrite(LED_PIN, ledState);
+
+  printCounter();
+}
+
+void printCounter() {
+  Serial.print("Counter: ");
+  Serial.print(counter);
+  Serial.print("\n");
 }
 
 void loop() {
@@ -38,8 +46,6 @@ void loop() {
   int readingRed = digitalRead(BUTTON_RED_PIN);
   int readingGreen = digitalRead(BUTTON_GREEN_PIN);
 
-  Serial.println(counter);
-
   if (readingRed != lastRedButtonState) {
     lastRedDebounceTime = millis();
   }
@@ -53,6 +59,7 @@ void loop() {
 
       if (redButtonState == HIGH) {
         counter--;
+        printCounter();
       }
     }
   }
@@ -63,6 +70,7 @@ void loop() {
 
       if (greenButtonState == HIGH) {
         counter++;
+        printCounter();
       }
     }
   }
@@ -81,6 +89,6 @@ void loop() {
 
     Serial.print("Flashing the LED ");
     Serial.print(ledFlashesLeft);
-    Serial.println(" times!\n");
+    Serial.print(" times!\n");
   }
 }
