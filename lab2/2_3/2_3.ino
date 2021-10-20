@@ -50,16 +50,11 @@ void setup()
   digitalWrite(LED_PIN_BLUE, blueRedState);
 }
 
-void printCounter()
-{
-  Serial.print("Counter: ");
-  Serial.print(counter);
-  Serial.print("\n");
-}
-
 void loop()
 {
   if(lastPressedTime > 0 && clickCounter == 2 && millis() - lastPressedTime < 500) {
+    Serial.println("Detected double click!");
+
     digitalWrite(LED_PIN_BLUE, HIGH);
     delay(100);
     digitalWrite(LED_PIN_BLUE, LOW);
@@ -70,6 +65,8 @@ void loop()
 
   if (pressedInTime > 0 && millis() - pressedInTime > 2000)
   {
+    Serial.println("Detected long press!");
+
     digitalWrite(LED_PIN_GREEN, LOW);
     digitalWrite(LED_PIN_RED, HIGH);
     delay(alternateFlashingDelay);
@@ -79,8 +76,6 @@ void loop()
   }
 
   int reading = digitalRead(BUTTON_PIN);
-
-  Serial.println(reading);
 
   if (reading != lastButtonState)
   {
@@ -99,6 +94,7 @@ void loop()
 
   if(reading != lastButtonState) {
     if(reading == LOW) {
+      Serial.println("Detected button press!");
       pressedInTime = millis();
       lastPressedTime = millis();
       clickCounter++;
@@ -106,6 +102,7 @@ void loop()
       delay(30);
       digitalWrite(LED_PIN_RED, LOW);
     } else {
+      Serial.println("Detected button release!");
       pressedInTime = 0;
       digitalWrite(LED_PIN_GREEN, HIGH);
       delay(30);
