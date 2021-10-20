@@ -19,14 +19,17 @@ int greenLedState = LOW;
 int blueRedState = LOW;
 
 int buttonState;
-int lastButtonState = LOW;
+int lastButtonState = HIGH;
 
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 50;
+unsigned long pressedTime = 0;
 
 int counter = 0;
 int redFlashesLeft = 0;
 int greenFlashesLeft = 0;
+
+unsigned long alternateFlashingDelay = 300;
 
 void setup()
 {
@@ -54,14 +57,14 @@ void printCounter()
 
 void loop()
 {
-  if (redFlashesLeft > 0)
+  if (pressedTime > 0 && millis() - pressedTime > 2000)
   {
-    redFlashesLeft--;
-    digitalWrite(LED_PIN_RED, LOW);
-    delay(150);
+    digitalWrite(LED_PIN_GREEN, LOW);
     digitalWrite(LED_PIN_RED, HIGH);
-    delay(150);
-    return;
+    delay(alternateFlashingDelay);
+    digitalWrite(LED_PIN_GREEN, HIGH);
+    digitalWrite(LED_PIN_RED, LOW);
+    delay(alternateFlashingDelay);
   }
 
   int reading = digitalRead(BUTTON_PIN);
@@ -95,10 +98,12 @@ void loop()
 
   if(reading != lastButtonState) {
     if(reading == LOW) {
+      pressedTime = millis();
       digitalWrite(LED_PIN_RED, HIGH);
       delay(150);
       digitalWrite(LED_PIN_RED, LOW);
     } else {
+      pressedTime = 0;
       digitalWrite(LED_PIN_GREEN, HIGH);
       delay(150);
       digitalWrite(LED_PIN_GREEN, LOW);
