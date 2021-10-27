@@ -86,6 +86,8 @@ void loop()
 {
   if(running) {
     msTimeOnWatch = millis() - clock_reseted_at;
+  } else if(msTimeOnWatch == 0) {
+    clock_reseted_at = millis();
   }
 
   millisec  = msTimeOnWatch % 1000;
@@ -129,6 +131,7 @@ void loop()
   if(greenReading != lastGreenButtonState) {
     if(greenReading == LOW) {
       Serial.println("GREEN");
+
       running = !running;
     }
   }
@@ -140,10 +143,10 @@ void loop()
       msTimeOnWatch = 0;
       clock_reseted_at = millis();
 
-       millisec = 0;
- tseconds = 0;
- tminutes = 0;
- seconds = 0;
+      millisec = 0;
+      tseconds = 0;
+      tminutes = 0;
+      seconds = 0;
 
       
       lcd.clear();
