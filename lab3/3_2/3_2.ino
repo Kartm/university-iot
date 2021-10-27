@@ -1,6 +1,7 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>   
- 
+#include <math.h>
+
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 #define RED_BUTTON_PIN 2
@@ -37,22 +38,68 @@ void initLCD()
   lcd.backlight();
 }
 
-void output(long red, long green, long blue, int color_index) {
-  lcd.setCursor(0,0);
-
-  lcd.print("  ");
-  lcd.print(red);
-  
+void drawIndicator(bool red, bool green, bool blue) {
+  lcd.setCursor(0,1);
   lcd.print(" ");
+  lcd.setCursor(4,1);
+  lcd.print(" ");
+  lcd.setCursor(10,1);
+  lcd.print(" ");
+
+  if(red) {
+    lcd.setCursor(0,1);
+    lcd.print(">");
+  }
+
+  if(green) {
+    lcd.setCursor(4,1);
+    lcd.print(">");
+  }
+
+  if(blue) {
+    lcd.setCursor(10,1);
+    lcd.print(">");
+  }
+}
+
+void output(long red, long green, long blue, int color_index) {
+  lcd.setCursor(1,0);
+  lcd.print("RED");
+  
+  lcd.setCursor(5,0);
+  lcd.print("GREEN");
+
+  lcd.setCursor(11,0);
+  lcd.print("BLUE");
+
+  lcd.setCursor(1,1);
+  lcd.print(red);
+
+  lcd.setCursor(5,1);
   lcd.print(green);
 
-  lcd.print(" ");
+  lcd.setCursor(11,1);
   lcd.print(blue);
+
+  switch(color_index){
+    case 0: {
+      drawIndicator(1, 0, 0);
+      break;
+    }
+    case 1: {
+      drawIndicator(0, 1, 0);
+      break;
+    }
+    case 2: {
+      drawIndicator(0, 0, 1);
+      break;
+    }
+  }
 }
 
 void loop()
 {
-  output(255, 255, 255);
+  output(255, 255, 255, color_index);
 
   int redReading = digitalRead(RED_BUTTON_PIN);
 
@@ -71,9 +118,10 @@ void loop()
 
   if(redReading != lastRedButtonState) {
     if(redReading == LOW) {
-      Serial.println("RED");
+      color_index = (color_index + 1) % 3;
+      // Serial.println("RED");
       
-      lcd.clear();
+      // lcd.clear();
     }
   }
 
