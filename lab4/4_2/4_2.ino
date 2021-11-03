@@ -1,7 +1,5 @@
 #define LED 6
 
-unsigned long lastGreenDebounceTime = 0;
-unsigned long lastRedDebounceTime = 0;
 unsigned long debounceDelay = 50;
 
 bool led_state = LOW;
