@@ -31,6 +31,7 @@ void loop() {
     int delay_in_ms = argumentPart.toInt();
 
     if (ledPart != "LED") {
+      Serial.println("Command not beginning with \"LED\".");
       return;
     }
 
@@ -46,6 +47,8 @@ void loop() {
       }
 
       blinking = true;
+    } else {
+      Serial.println("Argument not recognized. Possible values: \"ON\", \"OFF\", \"BLINK\", \"BLINK [ms]\".");
     }
   }
 }
