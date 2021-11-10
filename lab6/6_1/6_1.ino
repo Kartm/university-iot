@@ -8,14 +8,16 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
-// uint8_t outside_sensor_address[8] = { 0x28, 0xEE, 0xD5, 0x64, 0x1A, 0x16, 0x02, 0xEC };
-// uint8_t inside_sensor_address[8] = { 0x28, 0x61, 0x64, 0x12, 0x3C, 0x7C, 0x2F, 0x27 };
-
 DeviceAddress outside_sensor_address;
 DeviceAddress inside_sensor_address;
 
 float outside_temperature = 0;
+float outside_temperature_min = 1000;
+float outside_temperature_max = -1000;
+
 float inside_temperature = 0;
+float inside_temperature_min = 1000;
+float inside_temperature_max = -1000;
 
 void printAddress(DeviceAddress deviceAddress)
 { 
@@ -27,17 +29,6 @@ void printAddress(DeviceAddress deviceAddress)
     if (i < 7) Serial.print(", ");
   }
   Serial.println("");
-}
-
-void printTemperature(DeviceAddress deviceAddress)
-{
-  float tempC = sensors.getTempC(deviceAddress);
-  Serial.print(tempC);
-  Serial.print((char)176);
-  Serial.print("C  |  ");
-  Serial.print(DallasTemperature::toFahrenheit(tempC));
-  Serial.print((char)176);
-  Serial.println("F");
 }
  
 void printSensorAddresses() {
@@ -83,11 +74,23 @@ void initLcd() {
 void drawLcd() {
   lcd.setCursor(0, 0);
 
-  lcd.print(String(outside_temperature, 1));
+  lcd.print("O" + String(outside_temperature, 1));
+  lcd.setCursor(5, 0);
+  lcd.print((char)223);
+  lcd.setCursor(6, 0);
+  lcd.print("m" + String(outside_temperature_min, 1));
+  lcd.setCursor(11, 0);
+  lcd.print("M" + String(outside_temperature_max, 1));
 
   lcd.setCursor(0, 1);
 
-  lcd.print(String(inside_temperature, 1));
+  lcd.print("I" + String(inside_temperature, 1));
+  lcd.setCursor(5, 1);
+  lcd.print((char)223);
+  lcd.setCursor(6, 1);
+  lcd.print("m" + String(inside_temperature_min, 1));
+  lcd.setCursor(11, 1);
+  lcd.print("M" + String(inside_temperature_max, 1));
 }
 
 void setup(void)
@@ -100,27 +103,31 @@ void setup(void)
 
   drawLcd();
 }
+
+void calculateMinMax() {
+  if(outside_temperature > outside_temperature_max) {
+    outside_temperature_max = outside_temperature;
+  }
+  if(outside_temperature < outside_temperature_min) {
+    outside_temperature_min = outside_temperature;
+  }
+
+  if(inside_temperature > inside_temperature_max) {
+    inside_temperature_max = inside_temperature;
+  }
+  if(inside_temperature < inside_temperature_min) {
+    inside_temperature_min = inside_temperature;
+  }
+}
  
 void loop(void)
 { 
-  // call sensors.requestTemperatures() to issue a global temperature 
-  // request to all devices on the bus
-  // Serial.print("Requesting temperatures...");
-  // sensors.requestTemperatures(); // Send the command to get temperatures
-  // Serial.println("DONE");
-  // // After we got the temperatures, we can print them here.
-  // // We use the function ByIndex, and as an example get the temperature from the first sensor only.
-  // Serial.print("Temperature for the device 1 (index 0) is: ");
-  // Serial.println(sensors.getTempCByIndex(0));  
-
   sensors.requestTemperatures();
   
-  Serial.print("Outside sensor: ");
-  printTemperature(outside_sensor_address);
-  
-  Serial.print("Inside sensor: ");
-  printTemperature(inside_sensor_address);
-  
-  Serial.println();
+  outside_temperature = sensors.getTempC(outside_sensor_address);
+  inside_temperature = sensors.getTempC(inside_sensor_address);
+
+  calculateMinMax();
+  drawLcd();
   delay(1000);
 }
