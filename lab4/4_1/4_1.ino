@@ -29,6 +29,7 @@ void setup() {
     pinMode(BLUE_LED, OUTPUT);
 
     lcd.clear();
+    lcd.home();
     lcd.print("POTENTIOMETER A0");
     lcd.setCursor(0, 1);
     lcd.print("V=");
@@ -61,9 +62,9 @@ void loop()
 
     if(readingStr.length() == 1) {
       voltageStr = " 00" + readingStr;
-    } if(readingStr.length() == 2) {
+    } else if(readingStr.length() == 2) {
       voltageStr = " 0" + readingStr;
-    } if(readingStr.length() == 3) {
+    }else  if(readingStr.length() == 3) {
       voltageStr = " " + readingStr;
     } else  {
       voltageStr = readingStr;
