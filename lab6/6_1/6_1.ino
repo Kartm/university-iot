@@ -5,6 +5,8 @@
 #define ONE_WIRE_BUS A1
 
 #define RED_BUTTON_PIN 2
+#define RED 6
+#define BLUE 3
  
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 OneWire oneWire(ONE_WIRE_BUS);
@@ -25,6 +27,9 @@ int redButtonState = HIGH;
 int lastRedButtonState = HIGH;
 unsigned long lastRedDebounceTime = 0;
 unsigned long debounceDelay = 50;
+
+bool red_state = LOW;
+bool blue_state = LOW;
 
 void printAddress(DeviceAddress deviceAddress)
 { 
@@ -106,6 +111,8 @@ void setup(void)
   sensors.begin();
 
   pinMode(RED_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(RED, OUTPUT); 
+  pinMode(BLUE, OUTPUT);
 
   printSensorAddresses();
   initLcd();
@@ -127,10 +134,25 @@ void calculateMinMax() {
   if(inside_temperature < inside_temperature_min) {
     inside_temperature_min = inside_temperature;
   }
+
+  if(outside_temperature > 27) {
+    red_state = HIGH;
+    blue_state = LOW;    
+  } else if (outside_temperature < 26) {
+    red_state = LOW;
+    blue_state = HIGH;
+  }
+
+  
 }
+
+unsigned long lastFetchDebounceTime = 0;
  
 void loop(void)
 { 
+digitalWrite(RED, red_state);
+  digitalWrite(BLUE, blue_state);
+
   int redReading = digitalRead(RED_BUTTON_PIN);
 
   if (redReading != lastRedButtonState)
@@ -147,7 +169,7 @@ void loop(void)
   }
 
   if(redReading != lastRedButtonState) {
-    if(redReading == LOW) {
+    if(redReading == HIGH) {
        outside_temperature_min = 1000;
  outside_temperature_max = -1000;
 
@@ -158,12 +180,18 @@ void loop(void)
 
   lastRedButtonState = redReading;
 
-  sensors.requestTemperatures();
+  if ((millis() - lastFetchDebounceTime) > 1000) {
+    lastFetchDebounceTime = millis();
+
+
+    sensors.requestTemperatures();
   
   outside_temperature = sensors.getTempC(outside_sensor_address);
   inside_temperature = sensors.getTempC(inside_sensor_address);
 
   calculateMinMax();
   drawLcd();
-  delay(1000);
+  }
+
+  
 }
