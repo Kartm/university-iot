@@ -3,6 +3,8 @@
 #include <LiquidCrystal_I2C.h>
  
 #define ONE_WIRE_BUS A1
+
+#define RED_BUTTON_PIN 2
  
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 OneWire oneWire(ONE_WIRE_BUS);
@@ -18,6 +20,11 @@ float outside_temperature_max = -1000;
 float inside_temperature = 0;
 float inside_temperature_min = 1000;
 float inside_temperature_max = -1000;
+
+int redButtonState = HIGH;
+int lastRedButtonState = HIGH;
+unsigned long lastRedDebounceTime = 0;
+unsigned long debounceDelay = 50;
 
 void printAddress(DeviceAddress deviceAddress)
 { 
@@ -98,6 +105,8 @@ void setup(void)
   Serial.begin(9600);
   sensors.begin();
 
+  pinMode(RED_BUTTON_PIN, INPUT_PULLUP);
+
   printSensorAddresses();
   initLcd();
 
@@ -122,6 +131,33 @@ void calculateMinMax() {
  
 void loop(void)
 { 
+  int redReading = digitalRead(RED_BUTTON_PIN);
+
+  if (redReading != lastRedButtonState)
+  {
+    lastRedDebounceTime = millis();
+  }
+
+   if ((millis() - lastRedDebounceTime) > debounceDelay)
+  {
+    if (redReading != redButtonState)
+    {
+      redButtonState = redReading;
+    }
+  }
+
+  if(redReading != lastRedButtonState) {
+    if(redReading == LOW) {
+       outside_temperature_min = 1000;
+ outside_temperature_max = -1000;
+
+ inside_temperature_min = 1000;
+ inside_temperature_max = -1000;
+    }
+  }
+
+  lastRedButtonState = redReading;
+
   sensors.requestTemperatures();
   
   outside_temperature = sensors.getTempC(outside_sensor_address);
