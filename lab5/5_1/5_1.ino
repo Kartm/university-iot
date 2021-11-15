@@ -171,7 +171,7 @@ public:
         return 0;
     }
 
-    String *goDeeper()
+    String *goMenuDeeper()
     {
         if (!hasSubMenus())
         {
@@ -181,7 +181,7 @@ public:
 
         if (isOpenSubMenu)
         {
-            String *name_array = children[currIndex].goDeeper();
+            String *name_array = children[currIndex].goMenuDeeper();
             if (name_array == nullptr)
             {
                 return getNameArr();
@@ -193,7 +193,7 @@ public:
         return getNameArr();
     }
 
-    String *goUp()
+    String *goMenuHigh()
     {
         if (!hasSubMenus())
         {
@@ -202,7 +202,7 @@ public:
 
         if (isOpenSubMenu)
         {
-            String *subMenuName = children[currIndex].goUp();
+            String *subMenuName = children[currIndex].goMenuHigh();
             if (subMenuName == nullptr)
             {
                 isOpenSubMenu = false;
@@ -290,13 +290,13 @@ float getTemperature(float temperature)
 
 void temperatureSensorIn()
 {
-    float temperature = getTemperature(69);
+    float temperature = getTemperature(40);
     lcdPrinter::printOnLcd("Temperature", String(temperature) + " " + temperatureUnit);
 }
 
 void temperatureSensorOut()
 {
-    float temperature = getTemperature(23);
+    float temperature = getTemperature(30);
     lcdPrinter::printOnLcd("Temperature", String(temperature) + " " + temperatureUnit);
 }
 
@@ -328,9 +328,9 @@ void aboutPage()
 {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("About");
+    lcd.print("ABOUT");
     lcd.setCursor(0, 1);
-    lcd.println("Marcin Kasperski");
+    lcd.println("LUKASZBLACHNICKI");
 }
 
 volatile int encoderLastFrame = 0;
@@ -357,24 +357,24 @@ ISR(PCINT1_vect)
     interrupts();
 }
 
-CustomMenu Power ("Power", 2, new (CustomMenu[2]) {{"On",  ledOn}, {"Off", ledOff}});
-CustomMenu Red ("Red", ChangeRed);
-CustomMenu Green ("Green", ChangeGreen);
-CustomMenu Blue ("Blue", ChangeBlue);
-CustomMenu LEDOptions ("LED Options", 4, new (CustomMenu[4]) {Power, Red, Green, Blue});
+CustomMenu Power ("LED LIGHT", 2, new (CustomMenu[2]) {{"On",  ledOn}, {"Off", ledOff}});
+CustomMenu Red ("RED", ChangeRed);
+CustomMenu Green ("GREEN", ChangeGreen);
+CustomMenu Blue ("BLUE", ChangeBlue);
+CustomMenu LEDOptions ("LED SETTINGS", 4, new (CustomMenu[4]) {Power, Red, Green, Blue});
 
-CustomMenu Backlight ("Backlight", 2, new (CustomMenu[2]) {{"On",  turnOnBacklight}, {"Off", turnOffBacklight}});
-CustomMenu Pointer ("Pointer",  3, new (CustomMenu[3]) {{"> ", caretPointer}, {"- ", dashPointer}, {"->", arrowPointer}});
-CustomMenu LCDDisplay ("LCD Display", 2, new (CustomMenu[2]) {Backlight, Pointer});
+CustomMenu Backlight ("BACKLIGHT", 2, new (CustomMenu[2]) {{"On",  turnOnBacklight}, {"Off", turnOffBacklight}});
+CustomMenu Pointer ("POINTER",  3, new (CustomMenu[3]) {{"> ", caretPointer}, {"- ", dashPointer}, {"->", arrowPointer}});
+CustomMenu LCDDisplay ("LCD SETTINGS", 2, new (CustomMenu[2]) {Backlight, Pointer});
 
-CustomMenu SensorIn ("Sensor IN",  temperatureSensorIn);
-CustomMenu SensorOut ("Sensor OUT",  temperatureSensorOut);
-CustomMenu Units ("Units", 2, new (CustomMenu[2]) {{"C ", changeToC}, {"F ", changeToF}});
-CustomMenu Temperature ("Temperature", 3, new (CustomMenu[3]) {SensorIn, SensorOut, Units});
+CustomMenu SensorIn ("TEMP SENSOR IN",  temperatureSensorIn);
+CustomMenu SensorOut ("TEMP SENSOR OUT",  temperatureSensorOut);
+CustomMenu Units ("UNIT", 2, new (CustomMenu[2]) {{"C ", changeToC}, {"F ", changeToF}});
+CustomMenu Temperature ("TEMPERATURE", 3, new (CustomMenu[3]) {SensorIn, SensorOut, Units});
 
-CustomMenu About ("About", 1, new (CustomMenu[1]) {{"Author", aboutPage}});
+CustomMenu About ("ABOUT", 1, new (CustomMenu[1]) {{"Author", aboutPage}});
 
-CustomMenu mainMenu ("Main Menu", 4, new (CustomMenu[4]) {LEDOptions, LCDDisplay, Temperature, About});
+CustomMenu mainMenu ("MENU", 4, new (CustomMenu[4]) {LEDOptions, LCDDisplay, Temperature, About});
 
 void setup()
 {
@@ -391,13 +391,12 @@ void setup()
     pinMode(ENCODER_B, INPUT_PULLUP);
     pinMode(LED_BUILTIN, OUTPUT);
 
-    initInOut();
     Serial.begin(9600);
     
     PCICR |= (1 << PCIE1);      //enable PCMSK1 scan
     PCMSK1 |= (1 << PCINT10);    //Set pin A2 on state change to trigger an interrupt.
 
-    mainMenu.goDeeper();
+    mainMenu.goMenuDeeper();
 }
 
 void loop()
@@ -416,9 +415,9 @@ void loop()
     }
     if (green())
     {
-        mainMenu.goDeeper();
+        mainMenu.goMenuDeeper();
     } else if (red())
     {
-        mainMenu.goUp();
+        mainMenu.goMenuHigh();
     }
 }
