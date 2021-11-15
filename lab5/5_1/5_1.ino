@@ -52,27 +52,27 @@ bool greenState()
 
 bool red()
 {
-  bool pressed = redState();
-  if(!lockRED && pressed)
-  {
-    lockRED = true;
-    return true;
-  }
-  lockRED = pressed;
-  return false;
+    bool pressed = redState();
+    if(!lockRED && pressed)
+    {
+        lockRED = true;
+        return true;
+    }
+    lockRED = pressed;
+    return false;
 }
 
 bool green()
 {
-  bool pressed = greenState();
-  if(!lockGREEN && pressed)
-  {
-    lockGREEN = true;
-    return true;
-  }
-  lockGREEN = pressed;
-  return false;
-} 
+    bool pressed = greenState();
+    if(!lockGREEN && pressed)
+    {
+        lockGREEN = true;
+        return true;
+    }
+    lockGREEN = pressed;
+    return false;
+}
 
 
 String pointer = "-> ";
@@ -94,7 +94,7 @@ public:
 
 struct CustomMenu
 {
-    CustomMenu(const String &option, int subMenusNumber, CustomMenu *subMenus) : name(option), children(subMenus), size(subMenusNumber)                                                                                         
+    CustomMenu(const String &option, int subMenusNumber, CustomMenu *subMenus) : name(option), children(subMenus), size(subMenusNumber)
     {}
 
     CustomMenu(const String &name, void (*func)()) : name(name), func(func)
@@ -109,7 +109,7 @@ private:
     int size = 0;
     int currIndex{};
 
-    void (*func)(){};
+    void (*func)() {};
 
 
 private:
@@ -311,7 +311,7 @@ void changeToF()
 }
 void caretPointer()
 {
-  pointer = ">  ";
+    pointer = ">  ";
 }
 
 void arrowPointer()
@@ -357,24 +357,39 @@ ISR(PCINT1_vect)
     interrupts();
 }
 
-CustomMenu Power ("LED LIGHT", 2, new (CustomMenu[2]) {{"On",  ledOn}, {"Off", ledOff}});
+CustomMenu Power ("LED LIGHT", 2, new (CustomMenu[2]) { {"On",  ledOn}, {"Off", ledOff}
+});
 CustomMenu Red ("RED", ChangeRed);
 CustomMenu Green ("GREEN", ChangeGreen);
 CustomMenu Blue ("BLUE", ChangeBlue);
-CustomMenu LEDOptions ("LED SETTINGS", 4, new (CustomMenu[4]) {Power, Red, Green, Blue});
+CustomMenu LEDOptions ("LED SETTINGS", 4, new (CustomMenu[4]) {
+    Power, Red, Green, Blue
+});
 
-CustomMenu Backlight ("BACKLIGHT", 2, new (CustomMenu[2]) {{"On",  turnOnBacklight}, {"Off", turnOffBacklight}});
-CustomMenu Pointer ("POINTER",  3, new (CustomMenu[3]) {{"> ", caretPointer}, {"- ", dashPointer}, {"->", arrowPointer}});
-CustomMenu LCDDisplay ("LCD SETTINGS", 2, new (CustomMenu[2]) {Backlight, Pointer});
+CustomMenu Backlight ("BACKLIGHT", 2, new (CustomMenu[2]) { {"On",  turnOnBacklight}, {"Off", turnOffBacklight}
+});
+CustomMenu Pointer ("POINTER",  3, new (CustomMenu[3]) { {"> ", caretPointer}, {"- ", dashPointer}, {"->", arrowPointer}
+});
+CustomMenu LCDDisplay ("LCD SETTINGS", 2, new (CustomMenu[2]) {
+    Backlight, Pointer
+});
 
 CustomMenu SensorIn ("TEMP SENSOR IN",  temperatureSensorIn);
 CustomMenu SensorOut ("TEMP SENSOR OUT",  temperatureSensorOut);
-CustomMenu Units ("UNIT", 2, new (CustomMenu[2]) {{"C ", changeToC}, {"F ", changeToF}});
-CustomMenu Temperature ("TEMPERATURE", 3, new (CustomMenu[3]) {SensorIn, SensorOut, Units});
+CustomMenu Units ("UNIT", 2, new (CustomMenu[2]) { {"C ", changeToC}, {"F ", changeToF}
+});
+CustomMenu Temperature ("TEMPERATURE", 3, new (CustomMenu[3]) {
+    SensorIn, SensorOut, Units
+});
 
-CustomMenu About ("ABOUT", 1, new (CustomMenu[1]) {{"Author", aboutPage}});
+CustomMenu About ("ABOUT", 1, new (CustomMenu[1]) {
+    {"Author", aboutPage
+    }
+});
 
-CustomMenu mainMenu ("MENU", 4, new (CustomMenu[4]) {LEDOptions, LCDDisplay, Temperature, About});
+CustomMenu mainMenu ("MENU", 4, new (CustomMenu[4]) {
+    LEDOptions, LCDDisplay, Temperature, About
+});
 
 void setup()
 {
@@ -392,7 +407,7 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
 
     Serial.begin(9600);
-    
+
     PCICR |= (1 << PCIE1);      //enable PCMSK1 scan
     PCMSK1 |= (1 << PCINT10);    //Set pin A2 on state change to trigger an interrupt.
 
